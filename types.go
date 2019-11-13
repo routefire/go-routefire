@@ -1,4 +1,4 @@
-package routefireApi
+package routefire
 
 type UserLoginResponse struct {
 	Token string `json:"token"`

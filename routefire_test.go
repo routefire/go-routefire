@@ -1,4 +1,4 @@
-package routefireApi
+package routefire
 
 import (
 	"fmt"
