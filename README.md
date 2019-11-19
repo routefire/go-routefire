@@ -17,7 +17,8 @@ import (
 ### Getting an account
 
 You will at minimum need a free Routefire account, which can be obtained for free at
- the [Routefire web site](https://routefire.io).
+ the [Routefire web site](https://routefire.io/signup) -- use the access code `OSSFIRE`
+to obtain a free account supporting all DMA features.
  
 ## Usage
 
@@ -68,12 +69,32 @@ The DMA API provides low-level access to the connectivity layer in Routefire Cor
 Therefore, DMA orders specify precisely the venue and price level at which to place 
 a trade, instead of using an algorithm to decide the optimal way to enter the order.
 
-The DMA API is available via the methods ending in `*DMA`: `SubmitOrderDMA`, 
-`OrderStatusDMA`, `CancelOrderDMA`, `GetConsolidatedOrderBookDMA`, and
-`BalanceDMA`. 
+The DMA API is available via the methods ending in `*DMA`: 
+- `SubmitOrderDMA`: submit an order to a trading venue
+- `OrderStatusDMA`: get order status from a trading venue
+- `CancelOrderDMA`: cancel a given order at a trading venue
+- `GetConsolidatedOrderBookDMA`: get consolidated order book across trading venues 
+- `BalanceDMA`: get balance for a given asset at a given venue 
 
-In general, the usage of these functions is straightforward and uses 
-venue-generated order IDs exclusively. Relevant asset IDs, venue IDs, and
-other useful constants are provided in `costants.go` (e.g. `Usd`, `Btc`, 
-`CoinbasePro`, etc.).
+#### Handling numbers
 
+All functions accept string values for prices and quantities (to preserve numerical
+precision). 
+
+#### Important constants
+
+String identifiers are used to specify assets, trading venues, and side.
+These constants are provided in `costants.go`. Most importantly, there are:
+ 
+- Currencices: e.g. `Usd`, `Btc` 
+- Trading venues: e.g. `CoinbasePro`, `Binance`
+- Side: e.g. `SideBuy`, `SideSell`, `SideShort`, `SideCover`
+
+## Examples
+
+Examples are provided in the `examples` directory of this repository:
+
+- `data`: demonstrates how to fetch order book data and account balances using 
+  both the Core and DMA APIs.
+- `dma`: demonstrates how to use the DMA API to submit an order, watch it fill,
+  and expire it if it doesn't fill within five minutes.
