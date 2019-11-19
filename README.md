@@ -1,5 +1,8 @@
 # go-routefire: a native Go SDK for the Routefire API
 
+Trade cryptocurrencies and digital assets across all major exchanges with a single, 
+stable, unified API.
+
 ## Setup
 
 ### Importing 
