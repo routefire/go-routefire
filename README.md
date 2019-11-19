@@ -89,9 +89,9 @@ precision).
 String identifiers are used to specify assets, trading venues, and side.
 These constants are provided in `costants.go`. Most importantly, there are:
  
-- Currencices: e.g. `Usd`, `Btc` 
-- Trading venues: e.g. `CoinbasePro`, `Binance`
-- Side: e.g. `SideBuy`, `SideSell`, `SideShort`, `SideCover`
+- *Assets*: e.g. `Usd`, `Btc` 
+- *Trading venues*: e.g. `CoinbasePro`, `Binance`
+- *Side*: `SideBuy`, `SideSell`, `SideShort`, `SideCover`
 
 ## Examples
 
