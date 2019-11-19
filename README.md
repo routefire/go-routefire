@@ -32,6 +32,20 @@ simply call the `New` function:
 client := routefire.New(username, password)
 ```
 
+### Direct market access (DMA) orders
+
+The DMA API provides low-level access to the connectivity layer in Routefire Core. 
+Therefore, DMA orders specify precisely the venue and price level at which to place 
+a trade, instead of using an algorithm to decide the optimal way to enter the order.
+(A standard free Routefire account is a DMA account.)
+
+The DMA API is available via the methods ending in `*DMA`: 
+- `SubmitOrderDMA`: submit an order to a trading venue
+- `OrderStatusDMA`: get order status from a trading venue
+- `CancelOrderDMA`: cancel a given order at a trading venue
+- `GetConsolidatedOrderBookDMA`: get consolidated order book across trading venues 
+- `BalanceDMA`: get balance for a given asset at a given venue 
+
 ### Routefire (algorithmic) orders
 
 To submit orders that are worked by Routefire algorithms, a different set of methods
@@ -49,8 +63,13 @@ params := map[string]string{
 	"aggression":     "0.0",
 }
 
-resp, err := client.SubmitOrder(uid, "btc", "usd", "0.003", "10000.0", "rfxw", params)
+resp, err := client.SubmitOrder(uid, "btc", "usd", "0.003", "", "rfxw", params)
 ```
+
+This submits an algorithmic order to buy 0.003 BTC using USD via the RFXW trading
+algorithm. RFXW is instructed to target 100 seconds to fill the order, and the `1.0`
+value given to `backfill` indicates that liquidity can be taken to avoid falling
+behind schedule. Note that no price is provided or needed for algorithmic orders.
 
 The order ID for the new order (assuming submission was successful) will be contained in
 the `OrderId` field of `resp`. This ID can be used in subsequent calls to either check
@@ -65,19 +84,6 @@ Or:
 ```go
 status, err := client.CancelOrder(uid, resp.OrderId)
 ```
-
-### Direct market access (DMA) orders
-
-The DMA API provides low-level access to the connectivity layer in Routefire Core. 
-Therefore, DMA orders specify precisely the venue and price level at which to place 
-a trade, instead of using an algorithm to decide the optimal way to enter the order.
-
-The DMA API is available via the methods ending in `*DMA`: 
-- `SubmitOrderDMA`: submit an order to a trading venue
-- `OrderStatusDMA`: get order status from a trading venue
-- `CancelOrderDMA`: cancel a given order at a trading venue
-- `GetConsolidatedOrderBookDMA`: get consolidated order book across trading venues 
-- `BalanceDMA`: get balance for a given asset at a given venue 
 
 #### Handling numbers
 
