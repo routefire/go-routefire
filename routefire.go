@@ -59,6 +59,7 @@ func New(uid, password string) (*Client, error) {
 	if err := z.refreshToken(); err != nil {
 		return nil, err
 	}
+	// bookmark
 	go z.refreshLoop(AuthInterval * time.Second)
 	return z, nil
 }
