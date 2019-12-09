@@ -59,7 +59,7 @@ func New(uid, password string) (*Client, error) {
 	if err := z.refreshToken(); err != nil {
 		return nil, err
 	}
-	// bookmark
+
 	go z.refreshLoop(AuthInterval * time.Second)
 	return z, nil
 }
@@ -419,6 +419,20 @@ func (api *Client) queryAdaptPrivateWithBytes(command string, values []byte) ([]
 }
 
 func (api *Client) queryPrivate(command string, values map[string]interface{}) ([]byte, error) {
+	url := fmt.Sprintf("%s/%s/%s", ApiUrl(), APIVersion, command)
+
+	// TODO: needs cleanup
+	if len(api.accessToken) == 0 {
+		if err0 := api.refreshToken(); err0 != nil {
+			return nil, err0
+		}
+	}
+	headers := map[string]string{"Authorization": fmt.Sprintf("Bearer %s", api.accessToken)}
+	resp, err := api.doRequest(url, values, headers)
+	return resp, err
+}
+
+func (api *Client) QueryPrivate(command string, values map[string]interface{}) ([]byte, error) {
 	url := fmt.Sprintf("%s/%s/%s", ApiUrl(), APIVersion, command)
 
 	// TODO: needs cleanup
