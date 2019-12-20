@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -395,7 +394,7 @@ func (api *Client) refreshLoop(d time.Duration) {
 	for {
 		err := api.refreshToken()
 		if err != nil {
-			log.Printf("[RF] Failed to refresh auth token.\n")
+			//log.Printf("[RF] Failed to refresh auth token.\n")
 		}
 		time.Sleep(d)
 	}
@@ -403,7 +402,7 @@ func (api *Client) refreshLoop(d time.Duration) {
 
 func (api *Client) queryAdaptPrivateWithBytes(command string, values []byte) ([]byte, error) {
 	url := fmt.Sprintf("%s/%s/%s", AdaptApiUrl(), APIVersion, command)
-	log.Printf("Url: %s\n", url)
+	//log.Printf("Url: %s\n", url)
 
 	// TODO: needs cleanup
 	if len(api.accessToken) == 0 {
@@ -411,7 +410,7 @@ func (api *Client) queryAdaptPrivateWithBytes(command string, values []byte) ([]
 			return nil, err0
 		}
 	}
-	log.Printf("Auth token: %s\n", api.accessToken)
+	//log.Printf("Auth token: %s\n", api.accessToken)
 	headers := map[string]string{"Authorization": fmt.Sprintf("Bearer %s", api.accessToken)}
 	resp, err := api.doRequestBytes(url, values, headers)
 	return resp, err

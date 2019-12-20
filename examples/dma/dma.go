@@ -10,7 +10,7 @@ import (
 )
 
 func printUsage() {
-	fmt.Printf("Usage: ./dma -uid username -pass p@ssw0rd\n")
+	fmt.Printf("Usage: ./dma -uid username -pass p@ssw0rd -quantity 1.234\n")
 	os.Exit(1)
 }
 
