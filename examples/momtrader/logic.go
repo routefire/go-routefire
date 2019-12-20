@@ -13,6 +13,7 @@ import (
 
 type position struct {
 	asset string
+	venue string
 	size  string
 	price string
 }
@@ -198,23 +199,24 @@ func (m *MomentumTrader) Trade() error {
 	if len(m.Positions) > 0 && m.Positions[0].asset != winner {
 		// Sell the old position
 		curPos := m.Positions[0]
-		//m.log("Need to sell %s %s @ %s (%s)", curPos.asset, curPos.size, bb.Price, bo.Venue)
-		m.log("EXIT %s %s @ %s (%s)", curPos.size, curPos.asset, bb.Price, curPos)
-		err := m.doTrade(curPos.asset, bo.Venue, curPos.size, bb.Price, false)
+		curVenu := curPos.venue
+		sellPx := m.priceAtVenue(m.Positions[0].asset, curVenu, true)
+		m.log("EXIT %s %s @ %s (%s)", curPos.size, curPos.asset, sellPx, curPos)
+		err := m.doTrade(curPos.asset, curVenu, curPos.size, sellPx, false)
 		if err != nil || DevelopmentExecutionSafety {
 			return err
 		}
 
 		// Do the buy
-		m.log("ENTER %s %s @ %s (%s)", size, winner, px, bb.Venue)
-		err = m.doTrade(winner, bb.Venue, size, px, true)
+		m.log("ENTER %s %s @ %s (%s)", size, winner, px, bo.Venue)
+		err = m.doTrade(winner, bo.Venue, size, px, true)
 		if err != nil {
 			return err
 		}
 	} else if len(m.Positions) == 0 {
 		// Do the buy
-		m.log("ENTER[0] %s %s @ %s (%s)", size, winner, px, bb.Venue)
-		err = m.doTrade(winner, bb.Venue, size, px, true)
+		m.log("ENTER[0] %s %s @ %s (%s)", size, winner, px, bo.Venue)
+		err = m.doTrade(winner, bo.Venue, size, px, true)
 		if err != nil {
 			return err
 		}
@@ -223,8 +225,18 @@ func (m *MomentumTrader) Trade() error {
 	return nil
 }
 
-func (m *MomentumTrader) priceAtVenue(asst, venu string, isBid bool) string {
-	//
+func (m *MomentumTrader) priceAtVenue(asst, venu string, bidSide bool) string {
+	ob, err := m.RfClient.GetConsolidatedOrderBookDMA(m.UserId, routefire.Btc, routefire.Usd)
+	if err != nil {
+		return ""
+	}
+	if bidSide {
+		bids := ob.Data.Bids
+		return bids[0].Price
+	} else {
+		offers := ob.Data.Offers
+		return offers[len(offers)-1].Price
+	}
 }
 
 func (m *MomentumTrader) amountToTradeAt(px string) string {
@@ -252,7 +264,7 @@ func (m *MomentumTrader) doTrade(asset, venu, qty, px string, isBuy bool) error 
 	}
 	m.Orders = append(m.Orders, ord)
 
-	go func(errCh chan error, asst, size, price string, m0 *MomentumTrader, ordr *order) {
+	go func(errCh chan error, asst, size, price, venue string, m0 *MomentumTrader, ordr *order) {
 		mustCancel := false
 		select {
 		case err := <-errCh:
@@ -261,6 +273,7 @@ func (m *MomentumTrader) doTrade(asset, venu, qty, px string, isBuy bool) error 
 					// buy...
 					m.Positions = append(m.Positions, position{
 						asset: asset,
+						venue: venue,
 						size:  qty,
 						price: px,
 					})
@@ -286,7 +299,7 @@ func (m *MomentumTrader) doTrade(asset, venu, qty, px string, isBuy bool) error 
 				panic(err)
 			}
 		}
-	}(ch, asset, qty, px, m, ord)
+	}(ch, asset, qty, px, venu, m, ord)
 
 	return nil
 }

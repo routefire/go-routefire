@@ -13,6 +13,9 @@ func printUsage() {
 	fmt.Printf("Usage: ./momtrader -uid username -pass p@ssw0rd\n")
 	os.Exit(1)
 }
+
+// TODO: filter for balances; track PnL and order ID histories (for fees)
+
 func main(){
 
 	// Set up `flag` to accept a username and password via command-line arguments
