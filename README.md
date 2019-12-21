@@ -20,8 +20,7 @@ import (
 ### Getting an account
 
 You will at minimum need a free Routefire account, which can be obtained for free at
- the [Routefire web site](https://routefire.io/signup) -- use the access code `OSSFIRE`
-to obtain a free account supporting all DMA features.
+ the [Routefire web site](https://routefire.io/signup?q=oss).
  
 ## Usage
 
@@ -85,15 +84,17 @@ Or:
 status, err := client.CancelOrder(uid, resp.OrderId)
 ```
 
-#### Handling numbers
+## Schema
+
+### Handling numbers
 
 All functions accept string values for prices and quantities (to preserve numerical
 precision). 
 
-#### Important constants
+### Important constants
 
 String identifiers are used to specify assets, trading venues, and side.
-These constants are provided in `costants.go`. Most importantly, there are:
+These constants are provided in `constants.go`. Most importantly, there are:
  
 - *Assets*: e.g. `Usd`, `Btc` 
 - *Trading venues*: e.g. `CoinbasePro`, `Binance`
