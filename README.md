@@ -108,3 +108,4 @@ Examples are provided in the `examples` directory of this repository:
   both the Core and DMA APIs.
 - `dma`: demonstrates how to use the DMA API to submit an order, watch it fill,
   and expire it if it doesn't fill within five minutes.
+- `momtrader`: uses the DMA API to run a basic momentum trading strategy.
