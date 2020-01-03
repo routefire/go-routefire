@@ -18,6 +18,11 @@ type position struct {
 	price string
 }
 
+type pnlRecord struct {
+	asset string
+	pnl float64
+}
+
 type momentumParams struct {
 	gainerPeriods int
 	stdDevPeriods int
@@ -37,6 +42,7 @@ type MomentumTrader struct {
 	Alpha         float64
 	Positions     []position
 	Orders        []*order
+	PnlRecords    []*pnlRecord
 	BidHistory    map[string][]float64
 	AskHistory    map[string][]float64
 	LastOrderBook map[string]*routefire.DmaOrderBookResponse
@@ -57,6 +63,7 @@ func NewMomentumTrader(uid string, rfClient *routefire.Client, assets []string, 
 		Alpha:         alpha,
 		Positions:     nil,
 		Orders:        nil,
+		PnlRecords:    nil,
 		LastOrderBook: obm,
 		BidHistory:    m1,
 		AskHistory:    m2,
@@ -76,6 +83,9 @@ func (m *MomentumTrader) RunLoop(dur time.Duration) {
 		err := m.Trade()
 		if err != nil {
 			m.log("Trade() error: %s", err.Error())
+		} else {
+			totalPl := m.totalPnL()
+			m.log("Total PnL: %f", totalPl)
 		}
 		time.Sleep(dur)
 	}
@@ -149,6 +159,24 @@ func (m *MomentumTrader) stdDevs(asset string, nPeriods int) (float64, error) {
 	}
 	return 0.0, errors.New("InsufficientData")
 }
+func (m *MomentumTrader) totalPnL() float64 {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+	total := 0.0
+	for _, x := range m.PnlRecords {
+		total += x.pnl
+	}
+	return total
+}
+func (m *MomentumTrader) addPnL(asset string, amt float64) {
+	rig := &pnlRecord{
+		asset: asset,
+		pnl:   amt,
+	}
+	m.lock.Lock()
+	defer m.lock.Unlock()
+	m.PnlRecords = append(m.PnlRecords, rig)
+}
 
 func (m *MomentumTrader) Trade() error {
 	m.lock.Lock()
@@ -201,6 +229,8 @@ func (m *MomentumTrader) Trade() error {
 		curPos := m.Positions[0]
 		curVenu := curPos.venue
 		sellPx := m.priceAtVenue(m.Positions[0].asset, curVenu, true)
+		pnl := computePnLWithoutFees(curPos.size, curPos.price, sellPx)
+		m.addPnL(curPos.asset, pnl)
 		m.log("EXIT %s %s @ %s (%s)", curPos.size, curPos.asset, sellPx, curPos)
 		err := m.doTrade(curPos.asset, curVenu, curPos.size, sellPx, false)
 		if err != nil || DevelopmentExecutionSafety {
@@ -223,6 +253,14 @@ func (m *MomentumTrader) Trade() error {
 	}
 
 	return nil
+}
+
+func computePnLWithoutFees(size, oldPx, newPx string) float64 {
+	sizeF, _ := strconv.ParseFloat(size, 64)
+	costPxF, _ := strconv.ParseFloat(size, 64)
+	curPxF, _ := strconv.ParseFloat(size, 64)
+	pnl := sizeF * (curPxF-costPxF)
+	return pnl
 }
 
 func (m *MomentumTrader) priceAtVenue(asst, venu string, bidSide bool) string {
