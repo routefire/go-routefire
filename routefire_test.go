@@ -8,8 +8,8 @@ import (
 
 const (
 	UnitTestOrderId = "1f8a9516-4fc8-467c-840a-901f04e3a7a3"
-	uid = "johndoe@gmail.com"
-	password = "password"
+	uid             = "johndoe@gmail.com"
+	password        = "password"
 )
 
 var apiClient, _ = New(uid, password)
@@ -51,13 +51,31 @@ func TestRouteFireAPI_SubmitOrder(t *testing.T) {
 		"aggression":     "0.0",
 	}
 
-	resp, err := apiClient.SubmitOrder(uid, "btc", "usd", "0.003", "10000", "rfxw", params)
+	resp, err := apiClient.SubmitOrder(uid, "btc", "usd", "0.003", "", "rfxw", params)
 	if err != nil {
 		t.Errorf("SubmitOrder should not return error, got %s\n", err)
 	}
 
 	fmt.Printf("%+v\n", *resp)
 }
+
+func TestRouteFireAPI_SubmitOrderLimit(t *testing.T) {
+	params := map[string]string{
+		"target_seconds": "100",
+		"backfill":       "1.0",
+		"aggression":     "0.0",
+		"iwould":         "8000.0", // The limit price
+	}
+
+	// NOTE: buying USD, selling BTC = selling Bitcoin for U.S. dollars
+	resp, err := apiClient.SubmitOrder(uid, "usd", "btc", "0.003", "", "rfxw", params)
+	if err != nil {
+		t.Errorf("SubmitOrder should not return error, got %s\n", err)
+	}
+
+	fmt.Printf("%+v\n", *resp)
+}
+
 func TestRouteFireAPI_GetOrderStatus(t *testing.T) {
 	resp, err := apiClient.GetOrderStatus(uid, UnitTestOrderId)
 
