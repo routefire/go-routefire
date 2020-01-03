@@ -70,6 +70,28 @@ algorithm. RFXW is instructed to target 100 seconds to fill the order, and the `
 value given to `backfill` indicates that liquidity can be taken to avoid falling
 behind schedule. Note that no price is provided or needed for algorithmic orders.
 
+#### Price controls
+
+In order to impose price controls, *do not* use the `price` parameter to the `SubmitOrder`
+method; this parameter is largely unused by most algorithms. Instead, pass the
+price limit as an algo parameter using the keyword `iwould`, such as:
+
+```go
+params := map[string]string{
+	"target_seconds": "100",
+	"backfill":       "1.0",
+	"aggression":     "0.0",
+	"iwould":         "8000.0",
+}
+
+resp, err := client.SubmitOrder(uid, "btc", "usd", "0.003", "", "rfxw", params)
+```
+
+This snippet would have price protection of $8,000 maximum, so no order for greater than
+this amount would be accepted by the algorithm. 
+
+#### Return value
+
 The order ID for the new order (assuming submission was successful) will be contained in
 the `OrderId` field of `resp`. This ID can be used in subsequent calls to either check
 the status of or cancel the order. For example:
