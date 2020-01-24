@@ -1,6 +1,7 @@
 package routefire
 
 const (
+	// Status codes
 	StatusFilled          = "FILL"
 	StatusError           = "ERROR"
 	StatusPartiallyFilled = "PARTIAL_FILL"
@@ -9,9 +10,13 @@ const (
 	StatusComplete        = "COMPLETE"
 	StatusExpired         = "EXPIRED"
 
+	// Order side options
 	SideBuy  = "BUY"
 	SideSell = "SELL"
+	SideCover = "COVER"
+	SideShort = "SHORT"
 
+	// Venue IDs
 	CoinbasePro = "GDAX"
 	Gemini      = "GEMINI"
 	Binance     = "BINANCE"
@@ -20,10 +25,12 @@ const (
 	Bitfinex    = "BITFINEX"
 	Poloniex    = "POLONIEX"
 
+	// Fiat currency codes
 	Usd = "usd"
 	Eur = "eur"
 	Gbp = "gbp"
 
+	// Cryptocurrency codes (stablecoins)
 	Usdt = "usdt"
 	Usdc = "usdc"
 	Tusd = "tusd"
@@ -31,6 +38,7 @@ const (
 	Dai  = "dai"
 	Pax  = "pax"
 
+	// Cryptocurrency codes (other)
 	Btc = "btc"
 	Bch = "bch"
 	Eth = "eth"
